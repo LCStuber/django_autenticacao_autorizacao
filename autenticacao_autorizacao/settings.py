@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import environ
+from datetime import timedelta
 
 env = environ.Env(
     DEBUG = (bool, False)
@@ -26,10 +27,10 @@ environ.Env.read_env(BASE_DIR / Path('.env'))
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = env.str("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
+DEBUG = env.bool("DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -45,7 +46,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'autenticacao_autorizacao_app',
+    'rest_framework_simplejwt.token_blacklist',
 ]
+
+SIMPLE_JWT = {
+'ACCESS_TOKEN_LIFETIME': timedelta(minutes=env.int("ACCESS_TOKEN_LIFETIME")),
+'REFRESH_TOKEN_LIFETIME': timedelta(days=env.int("REFRESH_TOKEN_LIFETIME")),
+'ROTATE_REFRESH_TOKENS': env.bool("ROTATE_REFRESH_TOKENS"),
+'ALGORITHM': env.str("ALGORITHM"),
+'SIGNING_KEY': env.str('SECRET_KEY'),
+'AUTH_HEADER_TYPES': env.tuple("AUTH_HEADER_TYPES"),
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -83,12 +95,12 @@ WSGI_APPLICATION = 'autenticacao_autorizacao.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': env("DEFAULT_DB_ENGINE"),
-        'NAME': env("DEFAULT_DB_NAME"),
-        'USER': env("DEFAULT_DB_USER"),
-        'PASSWORD': env("DEFAULT_DB_PASSWORD"),
-        'HOST': env("DEFAULT_DB_HOST"),
-        'PORT': env("DEFAULT_DB_PORT"),
+        'ENGINE': env.str("DEFAULT_DB_ENGINE"),
+        'NAME': env.str("DEFAULT_DB_NAME"),
+        'USER': env.str("DEFAULT_DB_USER"),
+        'PASSWORD': env.str("DEFAULT_DB_PASSWORD"),
+        'HOST': env.str("DEFAULT_DB_HOST"),
+        'PORT': env.int("DEFAULT_DB_PORT"),
     }
 }
 
